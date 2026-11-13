@@ -1,0 +1,498 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated Campus Orbit user profile and active institutional role configuration.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the user."
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Display name of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user."
+        },
+        "activeRole": {
+          "type": "string",
+          "enum": ["SUPER_ADMIN", "COLLEGE_ADMIN", "FACULTY", "STUDENT", "PARENT"],
+          "description": "Currently active role in the Campus Orbit workspace."
+        },
+        "institutionName": {
+          "type": "string",
+          "description": "Name of the college or university institution."
+        },
+        "department": {
+          "type": "string",
+          "description": "Primary department affiliation."
+        },
+        "linkedStudentCode": {
+          "type": "string",
+          "description": "Linked student roll number for Parent/Guardian or Student role."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the profile was created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the profile was last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "fullName",
+        "email",
+        "activeRole",
+        "institutionName",
+        "department",
+        "linkedStudentCode",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "StudentRecord": {
+      "title": "StudentRecord",
+      "description": "Complete student academic, attendance, fee, and guardian profile.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the workspace owner."
+        },
+        "studentCode": {
+          "type": "string",
+          "description": "Unique student enrollment / roll ID."
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Full name of the student."
+        },
+        "email": {
+          "type": "string",
+          "description": "Institutional email address of the student."
+        },
+        "department": {
+          "type": "string",
+          "description": "Allocated academic department."
+        },
+        "semester": {
+          "type": "integer",
+          "description": "Current semester number (1 to 8)."
+        },
+        "cgpa": {
+          "type": "number",
+          "description": "Cumulative Grade Point Average (0.0 to 10.0)."
+        },
+        "attendancePct": {
+          "type": "integer",
+          "description": "Overall attendance percentage (0 to 100)."
+        },
+        "feeStatus": {
+          "type": "string",
+          "enum": ["PAID", "PENDING", "OVERDUE"],
+          "description": "Current semester tuition fee payment status."
+        },
+        "guardianName": {
+          "type": "string",
+          "description": "Verified parent or guardian name."
+        },
+        "guardianPhone": {
+          "type": "string",
+          "description": "Parent or guardian contact number."
+        },
+        "mentorName": {
+          "type": "string",
+          "description": "Assigned faculty mentor name."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["ACTIVE", "INACTIVE"],
+          "description": "Enrollment status."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "userId",
+        "studentCode",
+        "fullName",
+        "email",
+        "department",
+        "semester",
+        "cgpa",
+        "attendancePct",
+        "feeStatus",
+        "guardianName",
+        "guardianPhone",
+        "mentorName",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "FacultyRecord": {
+      "title": "FacultyRecord",
+      "description": "Faculty profile, subject allocation, qualification, and workload record.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the workspace owner."
+        },
+        "facultyCode": {
+          "type": "string",
+          "description": "Unique faculty employee ID."
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Full name of the professor or faculty member."
+        },
+        "email": {
+          "type": "string",
+          "description": "Institutional faculty email."
+        },
+        "department": {
+          "type": "string",
+          "description": "Assigned academic department."
+        },
+        "designation": {
+          "type": "string",
+          "description": "Academic title (Professor, Associate Professor, HOD, etc.)."
+        },
+        "qualification": {
+          "type": "string",
+          "description": "Highest academic qualification and specialization."
+        },
+        "assignedSubjects": {
+          "type": "string",
+          "description": "Comma-separated list of assigned subject codes and titles."
+        },
+        "workloadHours": {
+          "type": "integer",
+          "description": "Weekly lecture and lab workload hours."
+        },
+        "experienceYears": {
+          "type": "integer",
+          "description": "Total years of academic and research experience."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "userId",
+        "facultyCode",
+        "fullName",
+        "email",
+        "department",
+        "designation",
+        "qualification",
+        "assignedSubjects",
+        "workloadHours",
+        "experienceYears",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AttendanceRecord": {
+      "title": "AttendanceRecord",
+      "description": "Smart QR and manual attendance log entry.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the workspace owner."
+        },
+        "studentCode": {
+          "type": "string",
+          "description": "Student roll number."
+        },
+        "studentName": {
+          "type": "string",
+          "description": "Student full name."
+        },
+        "subjectCode": {
+          "type": "string",
+          "description": "Course/subject code."
+        },
+        "subjectName": {
+          "type": "string",
+          "description": "Course/subject title."
+        },
+        "department": {
+          "type": "string",
+          "description": "Department name."
+        },
+        "semester": {
+          "type": "integer",
+          "description": "Semester number (1 to 8)."
+        },
+        "sessionDate": {
+          "type": "string",
+          "description": "ISO date string for the attendance session."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["PRESENT", "ABSENT", "LATE"],
+          "description": "Attendance status."
+        },
+        "method": {
+          "type": "string",
+          "enum": ["QR_SCAN", "MANUAL"],
+          "description": "How attendance was recorded."
+        },
+        "sessionToken": {
+          "type": "string",
+          "description": "Unique QR session verification token."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "userId",
+        "studentCode",
+        "studentName",
+        "subjectCode",
+        "subjectName",
+        "department",
+        "semester",
+        "sessionDate",
+        "status",
+        "method",
+        "sessionToken",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "GrievanceRecord": {
+      "title": "GrievanceRecord",
+      "description": "Institutional grievance and complaint redressal ticket.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the workspace owner."
+        },
+        "ticketNumber": {
+          "type": "string",
+          "description": "Unique grievance tracking number."
+        },
+        "title": {
+          "type": "string",
+          "description": "Short summary of the grievance."
+        },
+        "category": {
+          "type": "string",
+          "description": "Category (Academic, Infrastructure, Hostel, Examination, Finance)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the issue."
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
+          "description": "Priority level."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["SUBMITTED", "UNDER_REVIEW", "ASSIGNED", "IN_PROGRESS", "RESOLVED", "REJECTED"],
+          "description": "Current resolution lifecycle status."
+        },
+        "submittedBy": {
+          "type": "string",
+          "description": "Name and ID of the submitter."
+        },
+        "assignedTo": {
+          "type": "string",
+          "description": "Assigned administrator or committee."
+        },
+        "resolutionNotes": {
+          "type": "string",
+          "description": "Official resolution or progress remarks."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "userId",
+        "ticketNumber",
+        "title",
+        "category",
+        "description",
+        "priority",
+        "status",
+        "submittedBy",
+        "assignedTo",
+        "resolutionNotes",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "CampusModuleItem": {
+      "title": "CampusModuleItem",
+      "description": "Operational entity for Departments, Courses, Exam Results, Timetables, Assignments, Fee Invoices, Notices, Facility Bookings, Certificates, Campus Events, Study Groups, Placements, and Audit Logs.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the workspace owner."
+        },
+        "moduleType": {
+          "type": "string",
+          "enum": [
+            "DEPARTMENT",
+            "COURSE",
+            "EXAM_RESULT",
+            "TIMETABLE",
+            "ASSIGNMENT",
+            "FEE_INVOICE",
+            "NOTICE",
+            "FACILITY_BOOKING",
+            "CERTIFICATE",
+            "EVENT",
+            "STUDY_GROUP",
+            "PLACEMENT",
+            "AUDIT_LOG"
+          ],
+          "description": "The functional module this item belongs to."
+        },
+        "code": {
+          "type": "string",
+          "description": "Reference code (e.g., course code, invoice number, room code, certificate ID)."
+        },
+        "title": {
+          "type": "string",
+          "description": "Primary title or subject name."
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "Secondary descriptor (e.g., schedule slot, company name, student name)."
+        },
+        "department": {
+          "type": "string",
+          "description": "Associated academic department or campus unit."
+        },
+        "semester": {
+          "type": "integer",
+          "description": "Associated semester (0 for all semesters)."
+        },
+        "status": {
+          "type": "string",
+          "description": "Current operational status (e.g., PUBLISHED, APPROVED, PAID, PENDING, OPEN)."
+        },
+        "category": {
+          "type": "string",
+          "description": "Sub-category, tag, or priority label."
+        },
+        "primaryMetric": {
+          "type": "number",
+          "description": "Numeric value such as marks, fee amount, credits, or package LPA."
+        },
+        "secondaryMetric": {
+          "type": "integer",
+          "description": "Secondary integer metric such as max marks, capacity, or member count."
+        },
+        "metadataText": {
+          "type": "string",
+          "description": "Detailed description, room number, syllabus link, or feedback notes."
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "Responsible faculty, student, HOD, or organizer name."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "userId",
+        "moduleType",
+        "code",
+        "title",
+        "subtitle",
+        "department",
+        "semester",
+        "status",
+        "category",
+        "primaryMetric",
+        "secondaryMetric",
+        "metadataText",
+        "ownerName",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Stores authenticated user profiles and active role configurations."
+    },
+    "/students/{studentId}": {
+      "schema": { "$ref": "#/entities/StudentRecord" },
+      "description": "Stores student academic, attendance, guardian, and fee records."
+    },
+    "/faculty/{facultyId}": {
+      "schema": { "$ref": "#/entities/FacultyRecord" },
+      "description": "Stores faculty profiles, qualifications, and subject allocations."
+    },
+    "/attendance/{attendanceId}": {
+      "schema": { "$ref": "#/entities/AttendanceRecord" },
+      "description": "Stores QR-code and manual attendance session logs."
+    },
+    "/grievances/{grievanceId}": {
+      "schema": { "$ref": "#/entities/GrievanceRecord" },
+      "description": "Stores student and faculty grievances and redressal workflow states."
+    },
+    "/campus_items/{itemId}": {
+      "schema": { "$ref": "#/entities/CampusModuleItem" },
+      "description": "Stores operational records across departments, courses, exams, timetables, assignments, fees, notices, facilities, certificates, events, study groups, placements, and audit logs."
+    }
+  }
+}
