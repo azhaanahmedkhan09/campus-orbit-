@@ -169,6 +169,25 @@ test("Authenticated user can query own students, grievances, and campus_items wi
 
   const aliceDb = testEnv.authenticatedContext(ALICE_UID).firestore();
   await assertSucceeds(
+    aliceDb.collection("campus_items").doc("alice_collab_proj").set({
+      userId: ALICE_UID,
+      moduleType: "COLLAB_PROJECT",
+      code: "PRJ-2026-99",
+      title: "Autonomous Campus Delivery Rover",
+      subtitle: "Tech: ROS2, Python • Team: 2/5",
+      department: "Mechanical & Robotics Engineering",
+      semester: 6,
+      status: "IN_PROGRESS",
+      category: "Robotics",
+      primaryMetric: 55,
+      secondaryMetric: 5,
+      metadataText: "Interdisciplinary robotics project.",
+      ownerName: "Aarav Mehta",
+      createdAt: now,
+      updatedAt: now,
+    })
+  );
+  await assertSucceeds(
     aliceDb.collection("students").where("userId", "==", ALICE_UID).get()
   );
   await assertSucceeds(

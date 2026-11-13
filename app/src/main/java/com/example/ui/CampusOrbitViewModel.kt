@@ -45,6 +45,7 @@ enum class OrbitSection(val title: String, val subtitle: String) {
     ATTENDANCE_QR("Smart QR Attendance", "Live QR session generator, student QR scanner, and attendance logs"),
     EXAMS_ASSIGNMENTS("Exams, Results & LMS", "SGPA/CGPA grading, hall tickets, assignments, and study materials"),
     FINANCE_GRIEVANCES("Finance & Grievances", "Tuition fee invoices, digital receipts, and grievance redressal"),
+    COLLABORATION_HUB("Campus Collaboration Hub", "Interdisciplinary project discovery, teams, tasks, showcase & faculty mentorship"),
     CAMPUS_LIFE("Facilities, Certs & Career", "Resource booking, certificates, events, study groups, and placements"),
     PARENT_PORTAL("Parent & Guardian Hub", "Verified ward oversight, attendance alerts, fees, and mentor connect"),
     SUPER_ADMIN_GOVERNANCE("Governance & Audit", "Institution configuration, RBAC matrix, and security audit trail")
@@ -832,6 +833,150 @@ class CampusOrbitViewModel(
         }
     }
 
+    fun updateCampusItemProgressAndStatus(
+        item: CampusModuleItem,
+        newStatus: String,
+        newProgress: Double,
+        updatedMeta: String = item.metadataText
+    ) {
+        if (isDemoMode || repository == null) {
+            demoCampusItemsFlow.value = demoCampusItemsFlow.value.map {
+                if (it.id == item.id) {
+                    it.copy(
+                        status = newStatus,
+                        primaryMetric = newProgress.coerceIn(0.0, 100.0),
+                        metadataText = updatedMeta,
+                        updatedAt = Timestamp.now()
+                    )
+                } else it
+            }
+            _statusBanner.value = "Updated '${item.title}' ($newStatus • ${newProgress.toInt()}%)."
+            return
+        }
+
+        viewModelScope.launch {
+            repository.updateCampusItem(
+                item.copy(
+                    status = newStatus,
+                    primaryMetric = newProgress.coerceIn(0.0, 100.0),
+                    metadataText = updatedMeta
+                )
+            ).onSuccess {
+                _statusBanner.value = "Updated '${item.title}' ($newStatus • ${newProgress.toInt()}%)."
+            }
+        }
+    }
+
+    fun sendCollaborationRequestOrInvite(
+        targetTitle: String,
+        department: String,
+        roleSkill: String,
+        requestType: String,
+        message: String,
+        requesterName: String
+    ) {
+        val existingItems = (campusItemsState.value as? UiState.Success)?.data ?: emptyList()
+        val duplicate = existingItems.any {
+            it.moduleType == CampusModuleType.COLLAB_REQUEST.name &&
+                it.title.equals(targetTitle.trim(), ignoreCase = true) &&
+                it.ownerName.equals(requesterName.trim(), ignoreCase = true) &&
+                (it.status == "PENDING" || it.status == "ACCEPTED")
+        }
+        if (duplicate) {
+            _statusBanner.value = "Duplicate Request Prevented: Active request/invitation already exists for '$targetTitle'."
+            return
+        }
+
+        addCampusModuleItem(
+            moduleType = CampusModuleType.COLLAB_REQUEST,
+            code = "CRQ-2026-${(100..999).random()}",
+            title = targetTitle.trim(),
+            subtitle = "Applicant/Target: $requesterName • Role: ${roleSkill.trim()}",
+            department = department.trim(),
+            semester = 6L,
+            status = "PENDING",
+            category = requestType.trim(),
+            primaryMetric = 1.0,
+            secondaryMetric = 1L,
+            metadataText = message.trim(),
+            ownerName = requesterName.trim()
+        )
+    }
+
+    fun upsertStudentCollaborationProfile(
+        studentId: String,
+        fullName: String,
+        department: String,
+        semester: Long,
+        preferredDomain: String,
+        technicalInterests: String,
+        projectsCompleted: Double,
+        bioAndExperience: String
+    ) {
+        val existingItems = (campusItemsState.value as? UiState.Success)?.data ?: emptyList()
+        val existingProfile = existingItems.firstOrNull {
+            it.moduleType == CampusModuleType.COLLAB_PROFILE.name &&
+                (it.code.equals(studentId.trim(), ignoreCase = true) ||
+                    it.title.equals(fullName.trim(), ignoreCase = true))
+        }
+
+        if (existingProfile != null) {
+            if (isDemoMode || repository == null) {
+                demoCampusItemsFlow.value = demoCampusItemsFlow.value.map {
+                    if (it.id == existingProfile.id) {
+                        it.copy(
+                            code = studentId.trim(),
+                            title = fullName.trim(),
+                            subtitle = technicalInterests.trim(),
+                            department = department.trim(),
+                            semester = semester,
+                            category = preferredDomain.trim(),
+                            primaryMetric = projectsCompleted,
+                            metadataText = bioAndExperience.trim(),
+                            ownerName = fullName.trim(),
+                            updatedAt = Timestamp.now()
+                        )
+                    } else it
+                }
+                _statusBanner.value = "Updated Collaboration Profile for $fullName ($studentId)."
+                return
+            }
+
+            viewModelScope.launch {
+                repository.updateCampusItem(
+                    existingProfile.copy(
+                        code = studentId.trim(),
+                        title = fullName.trim(),
+                        subtitle = technicalInterests.trim(),
+                        department = department.trim(),
+                        semester = semester,
+                        category = preferredDomain.trim(),
+                        primaryMetric = projectsCompleted,
+                        metadataText = bioAndExperience.trim(),
+                        ownerName = fullName.trim()
+                    )
+                ).onSuccess {
+                    _statusBanner.value = "Updated Collaboration Profile for $fullName ($studentId) in Firestore."
+                }
+            }
+        } else {
+            addCampusModuleItem(
+                moduleType = CampusModuleType.COLLAB_PROFILE,
+                code = studentId.trim(),
+                title = fullName.trim(),
+                subtitle = technicalInterests.trim(),
+                department = department.trim(),
+                semester = semester,
+                status = "OPEN_TO_COLLAB",
+                category = preferredDomain.trim(),
+                primaryMetric = projectsCompleted,
+                secondaryMetric = 1L,
+                metadataText = bioAndExperience.trim(),
+                ownerName = fullName.trim()
+            )
+        }
+    }
+
     fun deleteCampusItem(itemId: String, title: String) {
         if (isDemoMode || repository == null) {
             demoCampusItemsFlow.value = demoCampusItemsFlow.value.filterNot { it.id == itemId }
@@ -923,6 +1068,14 @@ class CampusOrbitViewModel(
                 CampusModuleType.FEE_INVOICE.name -> OrbitSection.FINANCE_GRIEVANCES
                 CampusModuleType.AUDIT_LOG.name -> OrbitSection.SUPER_ADMIN_GOVERNANCE
                 CampusModuleType.NOTICE.name -> OrbitSection.OVERVIEW
+                CampusModuleType.COLLAB_PROFILE.name,
+                CampusModuleType.COLLAB_PROJECT.name,
+                CampusModuleType.COLLAB_TEAM.name,
+                CampusModuleType.COLLAB_REQUEST.name,
+                CampusModuleType.COLLAB_TASK.name,
+                CampusModuleType.COLLAB_DISCUSSION.name,
+                CampusModuleType.COLLAB_SHOWCASE.name,
+                CampusModuleType.COLLAB_MENTORSHIP.name -> OrbitSection.COLLABORATION_HUB
                 else -> OrbitSection.CAMPUS_LIFE
             }
             results.add(

@@ -129,6 +129,24 @@ class CampusOrbitRepositoryRuleTest : FirestoreEmulatorTestBase() {
             ).getOrThrow()
         }
         assertTrue(itemId.isNotEmpty())
+
+        val collabProjId = withTimeout(DEFAULT_TIMEOUT_MS) {
+            repository.createCampusItem(
+                moduleType = CampusModuleType.COLLAB_PROJECT,
+                code = "PRJ-${UUID.randomUUID().toString().take(6)}",
+                title = "Smart Campus Energy Microgrid",
+                subtitle = "Tech: TensorFlow, ESP32, Kotlin",
+                department = "Computer Science & Engineering",
+                semester = 6L,
+                status = "IN_PROGRESS",
+                category = "Artificial Intelligence and Machine Learning",
+                primaryMetric = 65.0,
+                secondaryMetric = 5L,
+                metadataText = "Interdisciplinary AI + IoT microgrid project.",
+                ownerName = "Aarav Mehta"
+            ).getOrThrow()
+        }
+        assertTrue(collabProjId.isNotEmpty())
     }
 
     private companion object {

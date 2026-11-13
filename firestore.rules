@@ -127,7 +127,9 @@ service cloud.firestore {
              data.moduleType is string && data.moduleType in [
                'DEPARTMENT', 'COURSE', 'EXAM_RESULT', 'TIMETABLE', 'ASSIGNMENT',
                'FEE_INVOICE', 'NOTICE', 'FACILITY_BOOKING', 'CERTIFICATE',
-               'EVENT', 'STUDY_GROUP', 'PLACEMENT', 'AUDIT_LOG'
+               'EVENT', 'STUDY_GROUP', 'PLACEMENT', 'AUDIT_LOG',
+               'COLLAB_PROFILE', 'COLLAB_PROJECT', 'COLLAB_TEAM', 'COLLAB_REQUEST',
+               'COLLAB_TASK', 'COLLAB_DISCUSSION', 'COLLAB_SHOWCASE', 'COLLAB_MENTORSHIP'
              ] &&
              data.code is string && data.code.size() >= 1 && data.code.size() <= 64 &&
              data.title is string && data.title.size() >= 1 && data.title.size() <= 180 &&

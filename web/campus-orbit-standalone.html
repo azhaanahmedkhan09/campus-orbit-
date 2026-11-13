@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus Orbit — Unified Multi-Role Academic Operations & Campus Collaboration Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: #f1f5f9; }
+    h1, h2, h3, h4, .font-display { font-family: 'Space Grotesk', sans-serif; }
+    code, .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+  <div id="app"></div>
+
+  <script>
+    const ROLES = [
+      { key: 'SUPER_ADMIN', label: 'Super Administrator', badge: 'CHANCELLOR / SYSTEM ROOT', demoName: 'Dr. Julian Vance', demoEmail: 'chancellor.demo@campusorbit.edu', tagline: 'Full institutional control, RBAC permissions & system-wide audit logs' },
+      { key: 'COLLEGE_ADMIN', label: 'College Administrator', badge: 'PRINCIPAL / DEAN / HOD', demoName: 'Prof. Sarah Jenkins', demoEmail: 'admin.demo@campusorbit.edu', tagline: 'Departments, student & faculty operations, timetable, finance & grievance resolution' },
+      { key: 'FACULTY', label: 'Faculty / Professor', badge: 'PROFESSOR / MENTOR', demoName: 'Dr. Elena Rostova', demoEmail: 'faculty.demo@campusorbit.edu', tagline: 'Live QR attendance sessions, assignments, exam marks entry & project mentorship' },
+      { key: 'STUDENT', label: 'Student Scholar', badge: 'ENROLLED SCHOLAR', demoName: 'Aarav Mehta', demoEmail: 'student.demo@campusorbit.edu', tagline: 'QR attendance scanner, SGPA/CGPA results, Campus Collaboration Hub & placements' },
+      { key: 'PARENT', label: 'Parent / Guardian', badge: 'VERIFIED GUARDIAN', demoName: 'Rajesh Mehta', demoEmail: 'parent.demo@campusorbit.edu', tagline: 'Real-time ward attendance alerts, exam scorecards, fee payment status & mentor connect' }
+    ];
+
+    const COLLAB_CATEGORIES = [
+      'Artificial Intelligence and Machine Learning',
+      'Internet of Things',
+      'Web Development',
+      'Mobile Application Development',
+      'Robotics',
+      'Cloud Computing',
+      'Cybersecurity',
+      'Data Science',
+      'Electronics and Embedded Systems',
+      'Social Innovation'
+    ];
+
+    const state = {
+      loggedIn: false,
+      activeRoleKey: 'STUDENT',
+      section: 'COLLABORATION_HUB',
+      collabTab: 'OVERVIEW',
+      toast: null,
+      projectSearch: '',
+      projectCategory: 'ALL',
+      qrToken: 'ORB-CS601-20260513-LIVE',
+      students: [
+        { code: 'STU-2026-001', name: 'Aarav Mehta', dept: 'Computer Science & Engineering', sem: 6, cgpa: 9.24, att: 92, fee: 'PAID', guardian: 'Rajesh Mehta' },
+        { code: 'STU-2026-002', name: 'Zoya Khan', dept: 'Electronics & Communication', sem: 6, cgpa: 8.85, att: 71, fee: 'PENDING', guardian: 'Farhan Khan' },
+        { code: 'STU-2026-003', name: 'Rohan Deshmukh', dept: 'Mechanical & Robotics Engineering', sem: 4, cgpa: 8.42, att: 86, fee: 'PAID', guardian: 'Suresh Deshmukh' },
+        { code: 'STU-2026-004', name: 'Ananya Nair', dept: 'Computer Science & Engineering', sem: 8, cgpa: 9.62, att: 96, fee: 'PAID', guardian: 'Krishnan Nair' }
+      ],
+      projects: [
+        { code: 'PRJ-2026-301', title: 'Smart Campus Energy & Solar Microgrid Optimizer', category: 'Artificial Intelligence and Machine Learning', dept: 'Computer Science & Engineering', tech: 'Python, TensorFlow Lite, ESP32, Kotlin, Firestore', status: 'IN_PROGRESS', members: '3/5', lead: 'Aarav Mehta', desc: 'Predict building HVAC & lighting loads 24h ahead and balance rooftop solar battery discharge automatically.' },
+        { code: 'PRJ-2026-302', title: 'Autonomous Campus Library & Lab Delivery Rover', category: 'Robotics', dept: 'Mechanical & Robotics Engineering', tech: 'ROS2, LiDAR SLAM, OpenCV, SolidWorks, Jetson Nano', status: 'PLANNING', members: '2/4', lead: 'Rohan Deshmukh', desc: 'Autonomous sidewalk rover that delivers lab kits and library books across academic blocks.' },
+        { code: 'PRJ-2026-303', title: 'Zero-Trust Academic Credential & Skill Passport Vault', category: 'Cybersecurity', dept: 'Computer Science & Engineering', tech: 'Kotlin, Cryptography, Cloud Functions, React, WebAuthn', status: 'UNDER_REVIEW', members: '4/4', lead: 'Ananya Nair', desc: 'Tamper-proof cryptographic verification of student transcripts, hackathon badges, and project portfolios.' }
+      ],
+      profiles: [
+        { code: 'STU-2026-001', name: 'Aarav Mehta', dept: 'Computer Science & Engineering', sem: 6, domain: 'Artificial Intelligence and Machine Learning', skills: 'Kotlin, React, Python, TensorFlow, Cloud Firestore', bio: 'Built real-time QR attendance engine & RAG assistant. Looking for hardware & robotics collaborators.' },
+        { code: 'STU-2026-002', name: 'Zoya Khan', dept: 'Electronics & Communication', sem: 6, domain: 'Internet of Things', skills: 'C++, ESP32, PCB Design, RTOS, LoRaWAN, MQTT', bio: 'National Embedded Systems Finalist. Designing ultra-low-power sensor nodes for smart environments.' },
+        { code: 'STU-2026-003', name: 'Rohan Deshmukh', dept: 'Mechanical & Robotics Engineering', sem: 4, domain: 'Robotics', skills: 'ROS2, SolidWorks, Gazebo, LiDAR SLAM, Mechatronics', bio: 'Lead Mechanical Designer at Orbit Robotics Club. Building autonomous rovers for campus logistics.' }
+      ],
+      requests: [
+        { id: 'req1', code: 'CRQ-2026-501', title: 'Join Request: Smart Campus Energy & Solar Microgrid Optimizer', applicant: 'Rohan Deshmukh (Mechanical & Robotics)', role: 'Thermal & Enclosure Designer', status: 'PENDING', pitch: 'I can design weatherproof 3D-printed enclosures and solar tracker mounts for your rooftop sensor nodes.' }
+      ],
+      teams: [
+        { id: 'team1', code: 'CTM-2026-01', name: 'Team AuraGrid • Smart Campus Energy Microgrid', depts: 'Interdisciplinary (CSE + ECE)', status: 'IN_PROGRESS', progress: 65, lead: 'Aarav Mehta', members: 'Aarav Mehta (Lead), Zoya Khan (IoT), Ananya Nair (Cloud Security)', objectives: 'Cut Block B peak power draw by 22% | Shared GitHub repo + Figma dashboard + Circuit schematics.' }
+      ],
+      tasks: [
+        { id: 'tsk1', code: 'TSK-2026-701', title: 'Calibrate ESP32 Current Transformer & MQTT Broker TLS', team: 'Team AuraGrid • Milestone 2', assignee: 'Zoya Khan', priority: 'HIGH', status: 'IN_PROGRESS', deadline: '2026-05-22' },
+        { id: 'tsk2', code: 'TSK-2026-702', title: 'Train LSTM 24-Hour Campus Load Forecasting Model', team: 'Team AuraGrid • Milestone 1', assignee: 'Aarav Mehta', priority: 'CRITICAL', status: 'COMPLETED', deadline: '2026-05-10' }
+      ],
+      discussions: [
+        { code: 'DSC-2026-801', title: 'MQTT Payload Schema & Anomaly Thresholds Confirmed', channel: 'Team AuraGrid • Architecture Channel', author: 'Aarav Mehta', body: 'Standardized the JSON telemetry packet with voltage_rms, current_amp, power_kw, and pf. Zoya flashed Firmware v1.4 on Lab Node #2!' }
+      ],
+      showcases: [
+        { code: 'SHW-2026-901', title: 'MediDrone: Autonomous Campus AED & First-Aid Responder', category: 'Social Innovation', tech: 'PX4 Autopilot, YOLOv8, WebRTC, Kotlin Compose, Firebase', team: 'Ananya Nair, Rohan Deshmukh & Zoya Khan', outcome: '1st Place National Smart Campus Innovation Cup • Reaches any campus zone in 90 seconds.' }
+      ],
+      mentorships: [
+        { id: 'mnt1', code: 'MNT-2026-601', title: 'Mentorship: Smart Campus Energy & Solar Microgrid Optimizer', mentor: 'Dr. Elena Rostova (Professor & HOD, CSE)', status: 'ACCEPTED', notes: 'Milestone 1 Review: Excellent LSTM forecasting accuracy (94.6%). Add local ring-buffer storage on ESP32 for Milestone 2.' }
+      ]
+    };
+
+    function getRole() {
+      return ROLES.find(r => r.key === state.activeRoleKey) || ROLES[3];
+    }
+
+    function loginRole(roleKey) {
+      state.activeRoleKey = roleKey;
+      state.loggedIn = true;
+      const r = getRole();
+      state.toast = `Signed in with Demo Account: ${r.demoName} (${r.label})`;
+      render();
+    }
+
+    function requestJoin(projTitle) {
+      const target = `Join Request: ${projTitle}`;
+      if (state.requests.some(r => r.title === target && r.status === 'PENDING')) {
+        state.toast = `Duplicate Request Prevented: Pending request already exists for "${projTitle}"`;
+        render();
+        return;
+      }
+      state.requests.unshift({
+        id: 'req_' + Date.now(),
+        code: 'CRQ-2026-' + Math.floor(100 + Math.random() * 900),
+        title: target,
+        applicant: getRole().demoName,
+        role: 'Interdisciplinary Collaborator',
+        status: 'PENDING',
+        pitch: 'Excited to contribute to architecture, implementation, and milestone testing.'
+      });
+      state.toast = `Collaboration request sent for "${projTitle}"!`;
+      render();
+    }
+
+    function updateRequest(id, newStatus) {
+      const item = state.requests.find(r => r.id === id);
+      if (item) {
+        item.status = newStatus;
+        state.toast = `Updated request ${item.code} to ${newStatus}`;
+        render();
+      }
+    }
+
+    function cycleTask(id) {
+      const t = state.tasks.find(x => x.id === id);
+      if (t) {
+        t.status = t.status === 'TO_DO' ? 'IN_PROGRESS' : t.status === 'IN_PROGRESS' ? 'COMPLETED' : 'TO_DO';
+        state.toast = `Task ${t.code} moved to ${t.status}`;
+        render();
+      }
+    }
+
+    function bumpTeamProgress(id) {
+      const tm = state.teams.find(x => x.id === id);
+      if (tm) {
+        tm.progress = Math.min(100, tm.progress + 10);
+        if (tm.progress === 100) tm.status = 'COMPLETED';
+        state.toast = `Updated ${tm.name} progress to ${tm.progress}%`;
+        render();
+      }
+    }
+
+    function render() {
+      const root = document.getElementById('app');
+      const role = getRole();
+
+      if (!state.loggedIn) {
+        root.innerHTML = `
+          <div class="min-h-screen flex items-center justify-center p-6">
+            <div class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div class="lg:col-span-6 space-y-5">
+                <span class="inline-block px-3.5 py-1.5 rounded-full text-xs font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                  CAMPUS ORBIT • WEB APPLICATION & COLLABORATION HUB
+                </span>
+                <h1 class="text-4xl font-bold text-white font-display">
+                  Unified Multi-Role Academic Operations & Smart Campus Ecosystem
+                </h1>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                  Complete web platform connecting Student & Faculty Portals, Smart QR Attendance, SGPA/CGPA Grading, Conflict-Free Timetables, Finance, and the 9-module <strong>Campus Collaboration Hub</strong>.
+                </p>
+                <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-3">
+                  <h3 class="text-sm font-bold text-white">Institutional Portal Sign In</h3>
+                  <input value="${role.demoEmail}" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm" />
+                  <input type="password" value="••••••••••••" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm" />
+                  <button onclick="loginRole('${role.key}')" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm">
+                    Launch ${role.label} Web Portal
+                  </button>
+                </div>
+              </div>
+              <div class="lg:col-span-6 rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-3">
+                <h2 class="text-lg font-bold text-white font-display">1-Click Demo Accounts for All 5 Roles</h2>
+                ${ROLES.map(r => `
+                  <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-white">${r.label}</span>
+                        <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-blue-500/20 text-blue-300">${r.badge}</span>
+                      </div>
+                      <p class="text-xs text-cyan-400 mt-0.5">${r.demoName} • ${r.demoEmail}</p>
+                      <p class="text-xs text-slate-400 mt-0.5">${r.tagline}</p>
+                    </div>
+                    <button onclick="loginRole('${r.key}')" class="shrink-0 px-3.5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs">
+                      Quick Demo Login
+                    </button>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const collabTabs = [
+        ['OVERVIEW', '1. Overview'],
+        ['DISCOVER', '2. Discover Projects'],
+        ['REQUESTS', '3. My Collaborations'],
+        ['PROFILES', '4. Find Collaborators'],
+        ['WORKSPACE', '5. Team Workspace'],
+        ['TASKS', '6. Tasks & Milestones'],
+        ['DISCUSSIONS', '7. Discussions'],
+        ['SHOWCASE', '8. Project Showcase'],
+        ['MENTORSHIP', '9. Faculty Mentorship']
+      ];
+
+      let mainContent = '';
+      if (state.section === 'COLLABORATION_HUB') {
+        let subContent = '';
+        if (state.collabTab === 'OVERVIEW') {
+          subContent = `
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div class="rounded-2xl bg-slate-900 border border-slate-800 p-4"><p class="text-xs text-slate-400">Active Projects</p><p class="text-2xl font-bold text-blue-400 mt-1">${state.projects.length}</p></div>
+              <div class="rounded-2xl bg-slate-900 border border-slate-800 p-4"><p class="text-xs text-slate-400">Collaborators</p><p class="text-2xl font-bold text-cyan-400 mt-1">${state.profiles.length}</p></div>
+              <div class="rounded-2xl bg-slate-900 border border-slate-800 p-4"><p class="text-xs text-slate-400">Active Teams</p><p class="text-2xl font-bold text-emerald-400 mt-1">${state.teams.length}</p></div>
+              <div class="rounded-2xl bg-slate-900 border border-slate-800 p-4"><p class="text-xs text-slate-400">Showcased</p><p class="text-2xl font-bold text-purple-400 mt-1">${state.showcases.length}</p></div>
+              <div class="rounded-2xl bg-slate-900 border border-slate-800 p-4"><p class="text-xs text-slate-400">Pending Requests</p><p class="text-2xl font-bold text-amber-400 mt-1">${state.requests.filter(r => r.status === 'PENDING').length}</p></div>
+            </div>
+            <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-3">
+              <h3 class="text-base font-bold text-white">Department-Wise Collaboration Activity</h3>
+              <div class="space-y-2">
+                <div><div class="flex justify-between text-xs mb-1"><span>Computer Science & Engineering</span><span class="text-cyan-400">48%</span></div><div class="h-2.5 bg-slate-800 rounded-full"><div class="h-full bg-blue-500 rounded-full" style="width:48%"></div></div></div>
+                <div><div class="flex justify-between text-xs mb-1"><span>Electronics & Communication (IoT & VLSI)</span><span class="text-cyan-400">29%</span></div><div class="h-2.5 bg-slate-800 rounded-full"><div class="h-full bg-cyan-400 rounded-full" style="width:29%"></div></div></div>
+                <div><div class="flex justify-between text-xs mb-1"><span>Mechanical & Robotics Engineering</span><span class="text-cyan-400">23%</span></div><div class="h-2.5 bg-slate-800 rounded-full"><div class="h-full bg-emerald-400 rounded-full" style="width:23%"></div></div></div>
+              </div>
+            </div>
+          `;
+        } else if (state.collabTab === 'DISCOVER') {
+          subContent = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              ${state.projects.map(p => `
+                <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-3">
+                  <div class="flex justify-between text-xs">
+                    <span class="font-mono text-cyan-400">${p.code} • ${p.status}</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300">${p.category}</span>
+                  </div>
+                  <h4 class="text-lg font-bold text-white">${p.title}</h4>
+                  <p class="text-xs text-blue-400">Tech: ${p.tech} • Team: ${p.members}</p>
+                  <p class="text-sm text-slate-300">${p.desc}</p>
+                  <button onclick="requestJoin('${p.title}')" class="px-3.5 py-2 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs">Request to Join Project</button>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        } else if (state.collabTab === 'REQUESTS') {
+          subContent = state.requests.map(r => `
+            <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-2">
+              <div class="flex justify-between text-xs">
+                <span class="font-mono text-cyan-400">${r.code}</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold">${r.status}</span>
+              </div>
+              <h4 class="text-base font-bold text-white">${r.title}</h4>
+              <p class="text-xs text-blue-400">Applicant: ${r.applicant} • Role: ${r.role}</p>
+              <p class="text-sm text-slate-300">${r.pitch}</p>
+              <div class="flex gap-2 pt-2">
+                <button onclick="updateRequest('${r.id}','ACCEPTED')" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 text-xs font-bold">Accept</button>
+                <button onclick="updateRequest('${r.id}','REJECTED')" class="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-xs font-bold">Reject</button>
+                <button onclick="updateRequest('${r.id}','WITHDRAWN')" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-bold">Withdraw</button>
+              </div>
+            </div>
+          `).join('');
+        } else if (state.collabTab === 'PROFILES') {
+          subContent = `
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              ${state.profiles.map(pr => `
+                <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-2">
+                  <span class="text-xs font-mono text-cyan-400">${pr.code} • Sem ${pr.sem}</span>
+                  <h4 class="text-lg font-bold text-white">${pr.name}</h4>
+                  <p class="text-xs text-purple-300">${pr.domain}</p>
+                  <p class="text-xs text-blue-400">${pr.skills}</p>
+                  <p class="text-sm text-slate-300">${pr.bio}</p>
+                  <button onclick="requestJoin('Invite ${pr.name} to Team AuraGrid')" class="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-semibold">Invite to Team</button>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        } else if (state.collabTab === 'WORKSPACE') {
+          subContent = state.teams.map(tm => `
+            <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-3">
+              <div class="flex justify-between text-xs">
+                <span class="font-mono text-cyan-400">${tm.code} • ${tm.depts}</span>
+                <span class="text-emerald-400 font-bold">${tm.status} (${tm.progress}%)</span>
+              </div>
+              <h4 class="text-lg font-bold text-white">${tm.name}</h4>
+              <p class="text-xs text-blue-400">${tm.members}</p>
+              <p class="text-sm text-slate-300">${tm.objectives}</p>
+              <div class="w-full h-2.5 bg-slate-800 rounded-full"><div class="h-full bg-emerald-400 rounded-full" style="width:${tm.progress}%"></div></div>
+              <button onclick="bumpTeamProgress('${tm.id}')" class="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 text-xs font-bold">+10% Milestone Progress</button>
+            </div>
+          `).join('');
+        } else if (state.collabTab === 'TASKS') {
+          subContent = state.tasks.map(t => `
+            <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-mono text-cyan-400">${t.code} • Priority: ${t.priority} • Due: ${t.deadline}</span>
+                <h4 class="text-base font-bold text-white">${t.title}</h4>
+                <p class="text-xs text-blue-400">${t.team} • Assignee: ${t.assignee}</p>
+              </div>
+              <button onclick="cycleTask('${t.id}')" class="px-3.5 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold">${t.status}</button>
+            </div>
+          `).join('');
+        } else if (state.collabTab === 'DISCUSSIONS') {
+          subContent = state.discussions.map(d => `
+            <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-2">
+              <span class="text-xs font-mono text-cyan-400">${d.channel} • Author: ${d.author}</span>
+              <h4 class="text-base font-bold text-white">${d.title}</h4>
+              <p class="text-sm text-slate-300">${d.body}</p>
+            </div>
+          `).join('');
+        } else if (state.collabTab === 'SHOWCASE') {
+          subContent = state.showcases.map(s => `
+            <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-2">
+              <span class="text-xs font-mono text-emerald-400">${s.code} • ${s.category}</span>
+              <h4 class="text-lg font-bold text-white">${s.title}</h4>
+              <p class="text-xs text-cyan-400">Tech: ${s.tech}</p>
+              <p class="text-sm text-slate-300">${s.outcome}</p>
+              <p class="text-xs text-slate-400">Team: ${s.team}</p>
+            </div>
+          `).join('');
+        } else {
+          subContent = state.mentorships.map(m => `
+            <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-2">
+              <span class="text-xs font-mono text-cyan-400">${m.code} • ${m.status}</span>
+              <h4 class="text-base font-bold text-white">${m.title}</h4>
+              <p class="text-xs text-blue-400">${m.mentor}</p>
+              <p class="text-sm text-slate-300">${m.notes}</p>
+            </div>
+          `).join('');
+        }
+
+        mainContent = `
+          <div class="space-y-6">
+            <div class="rounded-2xl bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 border border-blue-500/30 p-6">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300">CAMPUS COLLABORATION HUB</span>
+              <h2 class="text-2xl font-bold text-white mt-2 font-display">Welcome, ${role.demoName} — Interdisciplinary Project & Team Hub</h2>
+              <p class="text-sm text-slate-300 mt-1">Connect across departments, discover projects, manage teams, track milestones, and collaborate with faculty mentors.</p>
+            </div>
+            <div class="flex flex-wrap gap-2 bg-slate-900 border border-slate-800 p-2.5 rounded-2xl">
+              ${collabTabs.map(([k, label]) => `
+                <button onclick="state.collabTab='${k}';render()" class="px-3.5 py-2 rounded-xl text-xs font-semibold ${state.collabTab === k ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300'}">${label}</button>
+              `).join('')}
+            </div>
+            <div class="space-y-4">${subContent}</div>
+          </div>
+        `;
+      } else {
+        mainContent = `
+          <div class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5"><p class="text-xs text-slate-400">Enrolled Students</p><p class="text-3xl font-bold text-white mt-1">${state.students.length}</p></div>
+              <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5"><p class="text-xs text-slate-400">Active Projects</p><p class="text-3xl font-bold text-cyan-400 mt-1">${state.projects.length}</p></div>
+              <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5"><p class="text-xs text-slate-400">Live QR Session</p><p class="text-sm font-mono font-bold text-emerald-400 mt-2">${state.qrToken}</p></div>
+              <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5"><p class="text-xs text-slate-400">Active Role</p><p class="text-lg font-bold text-blue-400 mt-1">${role.label}</p></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              ${state.students.map(s => `
+                <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5">
+                  <div class="flex justify-between text-xs"><span class="font-mono text-cyan-400">${s.code}</span><span class="font-bold text-emerald-400">Attendance: ${s.att}% • CGPA: ${s.cgpa}</span></div>
+                  <h4 class="text-base font-bold text-white mt-1">${s.name}</h4>
+                  <p class="text-xs text-slate-400">${s.dept} • Sem ${s.sem} • Fee: ${s.fee} • Guardian: ${s.guardian}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      root.innerHTML = `
+        <div class="min-h-screen flex flex-col lg:flex-row">
+          <aside class="w-full lg:w-72 bg-slate-900 border-b lg:border-b-0 lg:border-r border-slate-800 p-5 flex flex-col justify-between">
+            <div class="space-y-4">
+              <div>
+                <h1 class="text-xl font-bold text-white font-display">CAMPUS ORBIT</h1>
+                <p class="text-xs text-slate-400">Orbit Institute of Technology</p>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                <p class="text-[11px] font-mono text-cyan-400">${role.badge}</p>
+                <p class="text-sm font-bold text-white">${role.demoName}</p>
+                <p class="text-xs text-slate-400">${role.demoEmail}</p>
+              </div>
+              <div class="space-y-1">
+                <button onclick="state.section='OVERVIEW';render()" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold ${state.section === 'OVERVIEW' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'}">Command Center & Students</button>
+                <button onclick="state.section='COLLABORATION_HUB';render()" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold ${state.section === 'COLLABORATION_HUB' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'}">Campus Collaboration Hub (9 Tabs)</button>
+              </div>
+            </div>
+            <button onclick="state.loggedIn=false;render()" class="mt-4 w-full py-2 rounded-xl bg-rose-500/20 text-rose-300 text-xs font-bold">Sign Out</button>
+          </aside>
+          <div class="flex-1 flex flex-col">
+            <header class="bg-slate-900 border-b border-slate-800 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+              <h2 class="text-base font-bold text-white font-display">${state.section === 'COLLABORATION_HUB' ? 'Campus Collaboration Hub' : 'Institutional Command Center'}</h2>
+              <div class="flex gap-2">
+                ${ROLES.map(r => `
+                  <button onclick="loginRole('${r.key}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold ${state.activeRoleKey === r.key ? 'bg-cyan-500 text-slate-950' : 'bg-slate-800 text-slate-300'}">${r.label}</button>
+                `).join('')}
+              </div>
+            </header>
+            ${state.toast ? `<div class="mx-6 mt-4 px-4 py-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-xs text-emerald-300 font-semibold flex justify-between"><span>${state.toast}</span><button onclick="state.toast=null;render()">Dismiss</button></div>` : ''}
+            <main class="p-6 max-w-7xl w-full mx-auto">${mainContent}</main>
+          </div>
+        </div>
+      `;
+    }
+
+    render();
+  </script>
+</body>
+</html>

@@ -391,7 +391,15 @@
             "EVENT",
             "STUDY_GROUP",
             "PLACEMENT",
-            "AUDIT_LOG"
+            "AUDIT_LOG",
+            "COLLAB_PROFILE",
+            "COLLAB_PROJECT",
+            "COLLAB_TEAM",
+            "COLLAB_REQUEST",
+            "COLLAB_TASK",
+            "COLLAB_DISCUSSION",
+            "COLLAB_SHOWCASE",
+            "COLLAB_MENTORSHIP"
           ],
           "description": "The functional module this item belongs to."
         },

@@ -78,7 +78,15 @@ enum class CampusModuleType(val title: String) {
     EVENT("Campus Events"),
     STUDY_GROUP("Study Groups"),
     PLACEMENT("Placements & Skills"),
-    AUDIT_LOG("Security Audit Logs")
+    AUDIT_LOG("Security Audit Logs"),
+    COLLAB_PROFILE("Collaborator Profiles"),
+    COLLAB_PROJECT("Project Discovery Board"),
+    COLLAB_TEAM("Project Teams & Workspace"),
+    COLLAB_REQUEST("Collaboration Requests"),
+    COLLAB_TASK("Tasks & Milestones"),
+    COLLAB_DISCUSSION("Team Discussions"),
+    COLLAB_SHOWCASE("Project Showcase"),
+    COLLAB_MENTORSHIP("Faculty Mentorship")
 }
 
 @IgnoreExtraProperties

@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.FamilyRestroom
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Payments
@@ -88,6 +89,7 @@ import com.example.ui.auth.signOut
 import com.example.ui.modules.AcademicsAndTimetableSection
 import com.example.ui.modules.BadgeChip
 import com.example.ui.modules.CampusLifeAndCareerSection
+import com.example.ui.modules.CollaborationHubSection
 import com.example.ui.modules.ExamsAndAssignmentsSection
 import com.example.ui.modules.FacultyManagementSection
 import com.example.ui.modules.FinanceAndGrievancesSection
@@ -300,9 +302,9 @@ fun CampusOrbitAppShell(
                 val primaryTabs = listOf(
                     OrbitSection.OVERVIEW,
                     OrbitSection.STUDENTS,
+                    OrbitSection.COLLABORATION_HUB,
                     OrbitSection.ATTENDANCE_QR,
-                    OrbitSection.EXAMS_ASSIGNMENTS,
-                    OrbitSection.FINANCE_GRIEVANCES
+                    OrbitSection.EXAMS_ASSIGNMENTS
                 )
                 NavigationBar(
                     modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)
@@ -322,9 +324,9 @@ fun CampusOrbitAppShell(
                                     text = when (tab) {
                                         OrbitSection.OVERVIEW -> "Orbit"
                                         OrbitSection.STUDENTS -> "Students"
+                                        OrbitSection.COLLABORATION_HUB -> "Collab"
                                         OrbitSection.ATTENDANCE_QR -> "QR Att"
-                                        OrbitSection.EXAMS_ASSIGNMENTS -> "Exams"
-                                        else -> "Finance"
+                                        else -> "Exams"
                                     },
                                     maxLines = 1
                                 )
@@ -452,6 +454,29 @@ fun CampusOrbitAppShell(
                             onAdvanceGrievance = viewModel::advanceGrievanceStatus,
                             onCreateFeeInvoice = viewModel::addCampusModuleItem,
                             onUpdateInvoiceStatus = viewModel::updateCampusItemStatus
+                        )
+
+                        OrbitSection.COLLABORATION_HUB -> CollaborationHubSection(
+                            activeRole = activeRole,
+                            currentUserName = profile?.fullName ?: activeRole.demoName,
+                            currentStudentCode = linkedStudentCode,
+                            campusItems = campusItems,
+                            facultyList = faculty,
+                            onCreateItem = viewModel::addCampusModuleItem,
+                            onUpdateItemStatus = viewModel::updateCampusItemStatus,
+                            onUpdateItemProgressAndStatus = viewModel::updateCampusItemProgressAndStatus,
+                            onRequestJoinOrInvite = { targetTitle, dept, roleSkill, reqType, msg ->
+                                viewModel.sendCollaborationRequestOrInvite(
+                                    targetTitle = targetTitle,
+                                    department = dept,
+                                    roleSkill = roleSkill,
+                                    requestType = reqType,
+                                    message = msg,
+                                    requesterName = profile?.fullName ?: activeRole.demoName
+                                )
+                            },
+                            onUpsertCollabProfile = viewModel::upsertStudentCollaborationProfile,
+                            onDeleteItem = viewModel::deleteCampusItem
                         )
 
                         OrbitSection.CAMPUS_LIFE -> CampusLifeAndCareerSection(
@@ -637,6 +662,7 @@ private fun sectionIcon(section: OrbitSection): ImageVector = when (section) {
     OrbitSection.ATTENDANCE_QR -> Icons.Default.QrCode2
     OrbitSection.EXAMS_ASSIGNMENTS -> Icons.Default.EmojiEvents
     OrbitSection.FINANCE_GRIEVANCES -> Icons.Default.Payments
+    OrbitSection.COLLABORATION_HUB -> Icons.Default.Groups
     OrbitSection.CAMPUS_LIFE -> Icons.Default.Workspaces
     OrbitSection.PARENT_PORTAL -> Icons.Default.FamilyRestroom
     OrbitSection.SUPER_ADMIN_GOVERNANCE -> Icons.Default.AccountBalance

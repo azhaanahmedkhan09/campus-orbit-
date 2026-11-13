@@ -1100,9 +1100,160 @@ class CampusOrbitRepository(private val db: FirebaseFirestore) {
             status = "VERIFIED",
             category = "SECURITY AUDIT",
             primaryMetric = 100.0,
-            secondaryMetric = 18L,
-            metadataText = "All 18 academic and administrative modules synchronized with real-time Firestore listeners.",
+            secondaryMetric = 19L,
+            metadataText = "All academic, administrative, and Campus Collaboration Hub modules synchronized with real-time Firestore listeners.",
             ownerName = "System Security Engine"
+        ).getOrThrow()
+
+        // --- CAMPUS COLLABORATION HUB INITIAL RECORDS ---
+        createCampusItem(
+            moduleType = CampusModuleType.COLLAB_PROFILE,
+            code = "STU-2026-001",
+            title = "Aarav Mehta • Full-Stack & Distributed Cloud Architect",
+            subtitle = "Kotlin, Jetpack Compose, Go, Kubernetes, PyTorch • Open for Hackathons & Capstones",
+            department = "Computer Science & Engineering",
+            semester = 6L,
+            status = "AVAILABLE",
+            category = "Cloud Computing",
+            primaryMetric = 9.24,
+            secondaryMetric = 6L,
+            metadataText = "Interests: Distributed Systems, FinTech, Edge AI | Experience: Winner OrbitHack 2025 | Prefers: Interdisciplinary 4-member teams.",
+            ownerName = "Aarav Mehta"
+        ).getOrThrow()
+
+        createCampusItem(
+            moduleType = CampusModuleType.COLLAB_PROFILE,
+            code = "STU-2026-002",
+            title = "Maya Lin • Embedded IoT & Autonomous Hardware Lead",
+            subtitle = "RTOS, C++, ESP32, LoRaWAN, PCB Design, ROS2 • Seeking AI/Mobile Teammates",
+            department = "Electronics & Communication",
+            semester = 6L,
+            status = "AVAILABLE",
+            category = "Internet of Things",
+            primaryMetric = 8.95,
+            secondaryMetric = 5L,
+            metadataText = "Interests: Smart Agriculture, Wearable Telemetry, Swarm Robotics | Experience: IEEE Hardware Fellow.",
+            ownerName = "Maya Lin"
+        ).getOrThrow()
+
+        createCampusItem(
+            moduleType = CampusModuleType.COLLAB_PROJECT,
+            code = "PRJ-ORB-101",
+            title = "AeroSense — Autonomous Drone Swarm for Campus Micro-Climate & Air Quality Mapping",
+            subtitle = "Tech: ROS2, ESP32, Python, PyTorch, Jetpack Compose • Team: 3/5 Members",
+            department = "Electronics & Communication",
+            semester = 6L,
+            status = "IN_PROGRESS",
+            category = "Internet of Things",
+            primaryMetric = 3.0,
+            secondaryMetric = 5L,
+            metadataText = "Building a low-power LoRaWAN sensor mesh + autonomous quadcopter telemetry dashboard. Looking for 1 Mobile App developer and 1 ML engineer.",
+            ownerName = "Maya Lin (STU-2026-002)"
+        ).getOrThrow()
+
+        createCampusItem(
+            moduleType = CampusModuleType.COLLAB_PROJECT,
+            code = "PRJ-ORB-103",
+            title = "ZeroTrust Grid — Quantum-Resistant Campus Microgrid & Smart EV Charging Controller",
+            subtitle = "Tech: Go, Rust, Kubernetes, Modbus TCP • Team: 2/4 Members",
+            department = "Computer Science & Engineering",
+            semester = 6L,
+            status = "PLANNING",
+            category = "Cybersecurity",
+            primaryMetric = 2.0,
+            secondaryMetric = 4L,
+            metadataText = "Securing campus solar microgrid controllers with post-quantum mTLS authentication and predictive load balancing.",
+            ownerName = "Aarav Mehta (STU-2026-001)"
+        ).getOrThrow()
+
+        createCampusItem(
+            moduleType = CampusModuleType.COLLAB_TEAM,
+            code = "TEAM-NEBULA-01",
+            title = "Team Nebula Dynamics • Project: AeroSense Drone Swarm (PRJ-ORB-101)",
+            subtitle = "Leader: Maya Lin (ECE) • Members: Aarav Mehta (CSE), Rohan Deshmukh (Mech) • 3/5 Filled",
+            department = "Interdisciplinary (ECE + CSE + Mech)",
+            semester = 6L,
+            status = "IN_PROGRESS",
+            category = "Internet of Things",
+            primaryMetric = 68.0,
+            secondaryMetric = 5L,
+            metadataText = "Objectives: Complete LoRa telemetry PCB v2 & Android ground-control station | Resources: github.com/campusorbit/aerosense-swarm",
+            ownerName = "Maya Lin (STU-2026-002)"
+        ).getOrThrow()
+
+        createCampusItem(
+            moduleType = CampusModuleType.COLLAB_REQUEST,
+            code = "REQ-2026-301",
+            title = "Join Request: Liam O'Connor (STU-2026-003) -> AeroSense Drone Swarm (PRJ-ORB-101)",
+            subtitle = "Role Requested: Embedded Kernel & Telemetry Engineer • Dept: CSE Sem 4",
+            department = "Computer Science & Engineering",
+            semester = 4L,
+            status = "PENDING",
+            category = "JOIN_REQUEST",
+            primaryMetric = 1.0,
+            secondaryMetric = 4L,
+            metadataText = "Experienced with FreeRTOS and MAVLink telemetry parsing; can dedicate 12 hrs/week.",
+            ownerName = "Liam O'Connor (STU-2026-003)"
+        ).getOrThrow()
+
+        createCampusItem(
+            moduleType = CampusModuleType.COLLAB_TASK,
+            code = "TSK-102",
+            title = "Milestone 2: Build Jetpack Compose Live 3D Waypoint & Air-Quality Heatmap UI",
+            subtitle = "Team Nebula Dynamics • Assignee: Aarav Mehta • Due: Nov 28, 2026",
+            department = "Computer Science & Engineering",
+            semester = 6L,
+            status = "IN_PROGRESS",
+            category = "CRITICAL",
+            primaryMetric = 65.0,
+            secondaryMetric = 2L,
+            metadataText = "WebSocket telemetry ingestion complete; polishing real-time AQI gradient overlay.",
+            ownerName = "Aarav Mehta"
+        ).getOrThrow()
+
+        createCampusItem(
+            moduleType = CampusModuleType.COLLAB_DISCUSSION,
+            code = "DSC-NEBULA-01",
+            title = "[Team Nebula Dynamics] Flight Controller Firmware v2.1 Bench Test Results",
+            subtitle = "Posted by Maya Lin (Team Leader) • Active Thread",
+            department = "Electronics & Communication",
+            semester = 6L,
+            status = "PINNED",
+            category = "TEAM UPDATE",
+            primaryMetric = 3.0,
+            secondaryMetric = 6L,
+            metadataText = "PID loop tuning on the quadcopter test rig is stable! Ready to stream live JSON telemetry packets to the Android app at 20Hz.",
+            ownerName = "Maya Lin (STU-2026-002)"
+        ).getOrThrow()
+
+        createCampusItem(
+            moduleType = CampusModuleType.COLLAB_SHOWCASE,
+            code = "SHW-2026-01",
+            title = "BrailleWave — Haptic & Vision-Language Smart Reader for Visually Impaired Scholars",
+            subtitle = "Category: Social Innovation & AI • Winner: National Smart India Innovation Cup",
+            department = "Artificial Intelligence & Data Science",
+            semester = 8L,
+            status = "SHOWCASED",
+            category = "Social Innovation",
+            primaryMetric = 98.5,
+            secondaryMetric = 4L,
+            metadataText = "Problem: Textbook diagrams are inaccessible | Solution: Wearable camera + piezo braille matrix | Tech: Kotlin, PyTorch, STM32 | GitHub: github.com/campusorbit/braillewave",
+            ownerName = "Zara Al-Mansoor & Team"
+        ).getOrThrow()
+
+        createCampusItem(
+            moduleType = CampusModuleType.COLLAB_MENTORSHIP,
+            code = "MNT-2026-01",
+            title = "Mentorship: AeroSense Drone Swarm (Team Nebula) <-> Prof. Vikram Sethi",
+            subtitle = "Mentor: Prof. Vikram Sethi (ECE & Dean Academics) • Status: ACCEPTED",
+            department = "Electronics & Communication",
+            semester = 6L,
+            status = "ACCEPTED",
+            category = "Internet of Things",
+            primaryMetric = 92.0,
+            secondaryMetric = 6L,
+            metadataText = "Faculty Feedback: Excellent PCB layout and link-budget analysis. Recommend adding redundant barometer failsafe before outdoor flight demo.",
+            ownerName = "Prof. Vikram Sethi"
         ).getOrThrow()
 
         true
